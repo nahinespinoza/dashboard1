@@ -1,15 +1,16 @@
 // import { useState } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
+
+import TableUI from './components/TableUI';
+import ChartUI from './components/ChartUI';
 import './App.css'
 import { Grid } from '@mui/material';
 import SelectorUI from './components/SelectorUI';
 import IndicatorUI from './components/IndicatorUI';
 
-import DataFetcher from './functions/DataFetcher';
 
 function App() {
-   const dataFetcherOutput = DataFetcher();
 
    return (
       <Grid container spacing={5} justifyContent="center" alignItems="center">
@@ -48,10 +49,10 @@ function App() {
 
          </Grid>
          {/* Gráfico */}
-         <Grid size={{xs:12, md:6 }}>Elemento: Gráfico</Grid>
+         <Grid size={{xs:12, md:6 }}><ChartUI /></Grid>
 
          {/* Tabla */}
-         <Grid size={{xs:12, md:6 }} sx={{ display: { xs: "none", md: "block" } }}>Elemento: Tabla</Grid>
+         <Grid size={{xs:12, md:6 }} sx={{ display: { xs: "none", md: "block" } }}><TableUI /></Grid>
 
          {/* Información adicional */}
          <Grid size={{xs:12, md:12}}>Elemento: Información adicional</Grid>
