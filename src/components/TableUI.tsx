@@ -1,5 +1,10 @@
 import Box from '@mui/material/Box';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import DataFetcher from '../functions/DataFetcher';
+
+interface TableUIProps {
+  city: string;
+}
 
 function combineArrays(arrLabels: Array<string>, arrValues1: Array<number>, arrValues2: Array<number>) {
    return arrLabels.map((label, index) => ({
@@ -38,29 +43,34 @@ const columns: GridColDef[] = [
    },
 ];
 
-const arrValues1 = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
-const arrValues2 = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
-const arrLabels = ['A','B','C','D','E','F','G'];
+export default function TableUI({ city }: TableUIProps) {
+  const { data, loading, error } = DataFetcher(city);
 
-export default function TableUI() {
+  if (loading) return <div>Cargando datos...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!data) return <div>No hay datos disponibles.</div>;
 
-   const rows = combineArrays(arrLabels, arrValues1, arrValues2);
+  // Usar los datos reales de la API
+  const arrLabels = data.hourly.time;
+  const arrValues1 = data.hourly.temperature_2m;
+  const arrValues2 = data.hourly.wind_speed_10m;
+  const rows = combineArrays(arrLabels, arrValues1, arrValues2);
 
-   return (
-      <Box sx={{ height: 350, width: '100%' }}>
-         <DataGrid
-            rows={rows}
-            columns={columns}
-            initialState={{
-               pagination: {
-                  paginationModel: {
-                     pageSize: 5,
-                  },
-               },
-            }}
-            pageSizeOptions={[5]}
-            disableRowSelectionOnClick
-         />
-      </Box>
-   );
+  return (
+    <Box sx={{ height: 350, width: '100%' }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 5,
+            },
+          },
+        }}
+        pageSizeOptions={[5]}
+        disableRowSelectionOnClick
+      />
+    </Box>
+  );
 }
