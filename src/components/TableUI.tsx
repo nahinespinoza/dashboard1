@@ -1,9 +1,13 @@
-import Box from '@mui/material/Box';
+// TableUI.tsx
+import React from 'react';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import DataFetcher from '../functions/DataFetcher';
+import type { Hourly } from '../types/DashboardTypes';
+import { Box } from '@mui/material';
 
 interface TableUIProps {
-  city: string;
+  hourly: Hourly | null;
+  loading: boolean;
+  error: string | null;
 }
 
 function combineArrays(arrLabels: Array<string>, arrValues1: Array<number>, arrValues2: Array<number>) {
@@ -17,21 +21,9 @@ function combineArrays(arrLabels: Array<string>, arrValues1: Array<number>, arrV
 
 const columns: GridColDef[] = [
    { field: 'id', headerName: 'ID', width: 90 },
-   {
-      field: 'label',
-      headerName: 'Label',
-      width: 150,
-   },
-   {
-      field: 'value1',
-      headerName: 'Value 1',
-      width: 150,
-   },
-   {
-      field: 'value2',
-      headerName: 'Value 2',
-      width: 150,
-   },
+   { field: 'label', headerName: 'Hora', width: 150 },
+   { field: 'value1', headerName: 'Temperatura (°C)', width: 150 },
+   { field: 'value2', headerName: 'Viento (km/h)', width: 150 },
    {
       field: 'resumen',
       headerName: 'Resumen',
@@ -43,17 +35,14 @@ const columns: GridColDef[] = [
    },
 ];
 
-export default function TableUI({ city }: TableUIProps) {
-  const { data, loading, error } = DataFetcher(city);
-
+const TableUI: React.FC<TableUIProps> = ({ hourly, loading, error }) => {
   if (loading) return <div>Cargando datos...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!data) return <div>No hay datos disponibles.</div>;
+  if (error) return <div style={{color: 'red'}}>Error: {error}</div>;
+  if (!hourly) return <div>No hay datos disponibles.</div>;
 
-  // Usar los datos reales de la API
-  const arrLabels = data.hourly.time;
-  const arrValues1 = data.hourly.temperature_2m;
-  const arrValues2 = data.hourly.wind_speed_10m;
+  const arrLabels = hourly.time;
+  const arrValues1 = hourly.temperature_2m;
+  const arrValues2 = hourly.wind_speed_10m;
   const rows = combineArrays(arrLabels, arrValues1, arrValues2);
 
   return (
@@ -74,3 +63,5 @@ export default function TableUI({ city }: TableUIProps) {
     </Box>
   );
 }
+
+export default TableUI;

@@ -1,3 +1,4 @@
+// SelectorUI.tsx
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { type SelectChangeEvent } from '@mui/material/Select';
@@ -5,12 +6,12 @@ import MenuItem from '@mui/material/MenuItem';
 
 interface SelectorUIProps {
     city: string;
-    onCityChange: (city: string) => void;
+    onCityChange: (city: string) => void;  // Callback para cambiar la ciudad
 }
 
 export default function SelectorUI({ city, onCityChange }: SelectorUIProps) {
     const handleChange = (event: SelectChangeEvent<string>) => {
-        onCityChange(event.target.value);
+        onCityChange(event.target.value);  // Notifica al componente padre del cambio
     };
 
     return (

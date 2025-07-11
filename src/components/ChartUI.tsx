@@ -1,48 +1,59 @@
-import { LineChart } from '@mui/x-charts/LineChart';
-import Typography from '@mui/material/Typography';
-import DataFetcher from '../functions/DataFetcher';
+// ChartUI.tsx
+import React from 'react';
+import type { Hourly } from '../types/DashboardTypes';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+// Registrar los componentes necesarios
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface ChartUIProps {
-  city: string;
+  hourly: Hourly | null;
+  loading: boolean;
+  error: string | null;
 }
 
-export default function ChartUI({ city }: ChartUIProps) {
-  const { data, loading, error } = DataFetcher(city);
+const ChartUI: React.FC<ChartUIProps> = ({ hourly, loading, error }) => {
+  if (loading) return <div>Cargando gráfico...</div>;
+  if (error) return <div style={{color: 'red'}}>Error: {error}</div>;
+  if (!hourly) return <div>No hay datos para el gráfico.</div>;
 
-  if (loading) return <div>Cargando datos...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!data) return <div>No hay datos disponibles.</div>;
+  const data = {
+    labels: hourly.time,
+    datasets: [
+      {
+        label: 'Temperatura (°C)',
+        data: hourly.temperature_2m,
+        borderColor: 'rgba(255,99,132,1)',
+        fill: false,
+      },
+      {
+        label: 'Viento (km/h)',
+        data: hourly.wind_speed_10m,
+        borderColor: 'rgba(54,162,235,1)',
+        fill: false,
+      },
+    ],
+  };
 
-  // Usar los datos reales de la API
-  const arrLabels = data.hourly.time;
-  const arrValues1 = data.hourly.temperature_2m;
-  const arrValues2 = data.hourly.wind_speed_10m;
+  return <Line data={data} />;
+};
 
-  // Mostrar solo datos en intervalos (por ejemplo, cada 6 horas)
-  const step = 6;
-  const filteredLabels = arrValues2.filter((_, idx) => idx % step === 0).map(v => `${v} km/h`); // Etiquetas: velocidad del viento
-  const filteredValues1 = arrValues1.filter((_, idx) => idx % step === 0);
-  const filteredValues2 = arrValues2.filter((_, idx) => idx % step === 0);
-
-  // Calcular min y max para el eje Y
-  const allValues = [...filteredValues1, ...filteredValues2];
-  const minY = Math.min(...allValues);
-  const maxY = Math.max(...allValues);
-
-  return (
-    <>
-      <Typography variant="h5" component="div">
-        Temperatura y Viento (eje X: velocidad del viento)
-      </Typography>
-      <LineChart
-        height={300}
-        series={[
-          { data: filteredValues1, label: 'Temperatura (°C)'},
-          { data: filteredValues2, label: 'Viento (km/h)'},
-        ]}
-        xAxis={[{ scaleType: 'point', data: filteredLabels }]}
-        yAxis={[{ min: minY, max: maxY }]}
-      />
-    </>
-  );
-}
+export default ChartUI;

@@ -1,11 +1,6 @@
+// DataFetcher.tsx
 import { useEffect, useState } from 'react';
-import type { OpenMeteoResponse } from '../types/DashboardTypes';
-
-interface DataFetcherOutput {
-    data: OpenMeteoResponse | null;
-    loading: boolean;
-    error: string | null;
-}
+import type { RootInterface } from '../types/DashboardTypes';
 
 const cityCoords: Record<string, { lat: number; lon: number; timezone: string }> = {
     guayaquil: { lat: -2.1962, lon: -79.8862, timezone: 'America/Guayaquil' },
@@ -14,8 +9,8 @@ const cityCoords: Record<string, { lat: number; lon: number; timezone: string }>
     cuenca: { lat: -2.9006, lon: -79.0045, timezone: 'America/Guayaquil' },
 };
 
-export default function DataFetcher(city: string): DataFetcherOutput {
-    const [data, setData] = useState<OpenMeteoResponse | null>(null);
+export default function DataFetcher(city: string) {
+    const [data, setData] = useState<RootInterface | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -37,7 +32,7 @@ export default function DataFetcher(city: string): DataFetcherOutput {
                 if (!response.ok) {
                     throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
                 }
-                const result: OpenMeteoResponse = await response.json();
+                const result: RootInterface = await response.json();
                 setData(result);
             } catch (err: any) {
                 if (err instanceof Error) {
