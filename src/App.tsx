@@ -19,20 +19,58 @@ function App() {
 
     // Actualizar los indicadores cuando los datos estén disponibles
     useEffect(() => {
-        if (dataFetcherOutput.data && dataFetcherOutput.data.hourly) {
-            const hourlyData = dataFetcherOutput.data.hourly;
-            const units = dataFetcherOutput.data.hourly_units || {};
-            setTemperature(`${hourlyData.temperature_2m[0]} ${units.temperature_2m || '°C'}`);
-            setApparentTemperature(`${hourlyData.apparent_temperature[0]} ${units.apparent_temperature || '°C'}`);
-            setWindSpeed(`${hourlyData.wind_speed_10m[0]} ${units.wind_speed_10m || 'km/h'}`);
-            setHumidity(`${hourlyData.relative_humidity_2m[0]} ${units.relative_humidity_2m || '%'}`);
-        } else {
+    if (dataFetcherOutput.data && dataFetcherOutput.data.hourly) {
+        const hourlyData = dataFetcherOutput.data.hourly;
+        const units = dataFetcherOutput.data.hourly_units || {};
+
+        // Obtener el array de horas en formato ISO (ejemplo: '2025-07-14T12:00')
+        const times = hourlyData.time; // Suponiendo que existe hourly.time: string[]
+
+        if (!times || !times.length) {
+            // Si no hay horas, no actualizar
             setTemperature(null);
             setApparentTemperature(null);
             setWindSpeed(null);
             setHumidity(null);
+            return;
         }
-    }, [dataFetcherOutput.data]);
+
+        // Obtener hora actual en la misma zona horaria y formato
+        const now = new Date();
+
+        // Formatear la fecha a ISO sin segundos ni milisegundos (ejemplo: "2025-07-14T12:00")
+        const pad = (n: number) => (n < 10 ? '0' + n : n);
+        const year = now.getFullYear();
+        const month = pad(now.getMonth() + 1);
+        const day = pad(now.getDate());
+        const hour = pad(now.getHours());
+
+        const nowISO = `${year}-${month}-${day}T${hour}:00`;
+
+        // Buscar índice del tiempo actual
+        const index = times.indexOf(nowISO);
+
+        if (index === -1) {
+            // Si no encontró la hora actual, usar el primer dato como fallback
+            setTemperature(hourlyData.temperature_2m?.[0] != null ? `${hourlyData.temperature_2m[0]} ${units.temperature_2m || '°C'}` : null);
+            setApparentTemperature(hourlyData.apparent_temperature?.[0] != null ? `${hourlyData.apparent_temperature[0]} ${units.apparent_temperature || '°C'}` : null);
+            setWindSpeed(hourlyData.wind_speed_10m?.[0] != null ? `${hourlyData.wind_speed_10m[0]} ${units.wind_speed_10m || 'km/h'}` : null);
+            setHumidity(hourlyData.relative_humidity_2m?.[0] != null ? `${hourlyData.relative_humidity_2m[0]} ${units.relative_humidity_2m || '%'}` : null);
+        } else {
+            // Si encontró, usa ese índice
+            setTemperature(hourlyData.temperature_2m?.[index] != null ? `${hourlyData.temperature_2m[index]} ${units.temperature_2m || '°C'}` : null);
+            setApparentTemperature(hourlyData.apparent_temperature?.[index] != null ? `${hourlyData.apparent_temperature[index]} ${units.apparent_temperature || '°C'}` : null);
+            setWindSpeed(hourlyData.wind_speed_10m?.[index] != null ? `${hourlyData.wind_speed_10m[index]} ${units.wind_speed_10m || 'km/h'}` : null);
+            setHumidity(hourlyData.relative_humidity_2m?.[index] != null ? `${hourlyData.relative_humidity_2m[index]} ${units.relative_humidity_2m || '%'}` : null);
+        }
+    } else {
+        setTemperature(null);
+        setApparentTemperature(null);
+        setWindSpeed(null);
+        setHumidity(null);
+    }
+}, [dataFetcherOutput.data]);
+
 
     return (
         <Grid container spacing={5} justifyContent="center" alignItems="center">
