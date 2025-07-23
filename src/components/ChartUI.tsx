@@ -43,12 +43,28 @@ const ChartUI: React.FC<ChartUIProps> = ({ hourly, loading, error, selectedVaria
   if (error) return <div style={{color: 'red'}}>Error: {error}</div>;
   if (!hourly) return <div>No hay datos para el gráfico.</div>;
 
+  const arrLabels = hourly.time;
+  const arrValues = (hourly as any)[selectedVariable];
+
+  // Buscar el índice de la hora actual (formato: YYYY-MM-DDTHH:00)
+  const now = new Date();
+  const pad = (n: number) => (n < 10 ? '0' + n : n);
+  const year = now.getFullYear();
+  const month = pad(now.getMonth() + 1);
+  const day = pad(now.getDate());
+  const hour = pad(now.getHours());
+  const nowISO = `${year}-${month}-${day}T${hour}:00`;
+
+  let start = arrLabels.indexOf(nowISO);
+  if (start === -1) start = 0; // Si no encuentra la hora actual, empieza desde el principio
+
+  const end = start + 20;
   const data = {
-    labels: hourly.time,
+    labels: arrLabels.slice(start, end),
     datasets: [
       {
         label: VARIABLE_LABELS[selectedVariable] || selectedVariable,
-        data: (hourly as any)[selectedVariable],
+        data: arrValues.slice(start, end),
         borderColor: 'rgba(54,162,235,1)',
         backgroundColor: 'rgba(54,162,235,0.2)',
         fill: true,
