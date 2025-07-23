@@ -35,7 +35,8 @@ export default function DataFetcher(city: string) {
     setError(null);
 
     const { lat, lon, timezone } = cityCoords[city];
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=relative_humidity_2m,apparent_temperature,wind_speed_10m,temperature_2m&timezone=${timezone}`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,precipitation_probability&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=${timezone}`
+    // const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=relative_humidity_2m,apparent_temperature,wind_speed_10m,temperature_2m&timezone=${timezone}`;
     const cacheKey = `${CACHE_KEY_PREFIX}${city}`;
 
     const fetchData = async () => {

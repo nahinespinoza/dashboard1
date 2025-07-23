@@ -15,17 +15,19 @@ export interface RootInterface {
 export interface Hourly {
   time: string[];
   temperature_2m: number[];
-  apparent_temperature: number[];    // <-- Agregado
+  relative_humidity_2m: number[];
+  apparent_temperature: number[];
   wind_speed_10m: number[];
-  relative_humidity_2m: number[];    // <-- Agregado
+  precipitation_probability: number[];
 }
 
 export interface Hourlyunits {
   time: string;
   temperature_2m: string;
-  apparent_temperature: string;      // <-- Agregado
+  relative_humidity_2m: string;
+  apparent_temperature: string;
   wind_speed_10m: string;
-  relative_humidity_2m: string;      // <-- Agregado
+  precipitation_probability: string;
 }
 
 export interface Current {

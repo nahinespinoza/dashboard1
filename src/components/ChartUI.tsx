@@ -28,9 +28,17 @@ interface ChartUIProps {
   hourly: Hourly | null;
   loading: boolean;
   error: string | null;
+  selectedVariable: string;
 }
 
-const ChartUI: React.FC<ChartUIProps> = ({ hourly, loading, error }) => {
+const VARIABLE_LABELS: Record<string, string> = {
+  temperature_2m: 'Temperatura (°C)',
+  relative_humidity_2m: 'Humedad relativa (%)',
+  apparent_temperature: 'Temperatura aparente (°C)',
+  precipitation_probability: 'Probabilidad de precipitación (%)',
+};
+
+const ChartUI: React.FC<ChartUIProps> = ({ hourly, loading, error, selectedVariable }) => {
   if (loading) return <div>Cargando gráfico...</div>;
   if (error) return <div style={{color: 'red'}}>Error: {error}</div>;
   if (!hourly) return <div>No hay datos para el gráfico.</div>;
@@ -39,16 +47,11 @@ const ChartUI: React.FC<ChartUIProps> = ({ hourly, loading, error }) => {
     labels: hourly.time,
     datasets: [
       {
-        label: 'Temperatura (°C)',
-        data: hourly.temperature_2m,
-        borderColor: 'rgba(255,99,132,1)',
-        fill: false,
-      },
-      {
-        label: 'Viento (km/h)',
-        data: hourly.wind_speed_10m,
+        label: VARIABLE_LABELS[selectedVariable] || selectedVariable,
+        data: (hourly as any)[selectedVariable],
         borderColor: 'rgba(54,162,235,1)',
-        fill: false,
+        backgroundColor: 'rgba(54,162,235,0.2)',
+        fill: true,
       },
     ],
   };
