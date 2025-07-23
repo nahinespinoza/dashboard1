@@ -42,14 +42,29 @@ const ChartUI: React.FC<ChartUIProps> = ({ hourly, loading, error, selectedVaria
   if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
   if (!hourly) return <div>No hay datos para el gráfico.</div>;
 
+  const arrLabels = hourly.time;
+  const arrValues = hourly[selectedVariable]; // Obtener los valores de la variable seleccionada
+
+  const now = new Date();
+  const pad = (n: number) => (n < 10 ? '0' + n : n);
+  const year = now.getFullYear();
+  const month = pad(now.getMonth() + 1);
+  const day = pad(now.getDate());
+  const hour = pad(now.getHours());
+  const nowISO = `${year}-${month}-${day}T${hour}:00`;
+
+  let start = arrLabels.indexOf(nowISO);
+  if (start === -1) start = 0; // Si no encuentra la hora actual, empieza desde el principio
+
+  const end = start + 20; // Mostrar las siguientes 20 horas
   const data = {
-    labels: hourly.time,
+    labels: arrLabels.slice(start, end),
     datasets: [
       {
         label: VARIABLE_LABELS[selectedVariable] || selectedVariable,
-        data: hourly[selectedVariable],
-        borderColor: darkMode ? 'rgba(255,99,132,1)' : 'rgba(54,162,235,1)',  // Cambiar color según el tema
-        backgroundColor: darkMode ? 'rgba(255,99,132,0.2)' : 'rgba(54,162,235,0.2)',
+        data: arrValues.slice(start, end), 
+        borderColor: darkMode ? 'rgba(255,99,132,1)' : 'rgba(54,162,235,1)',  
+        backgroundColor: darkMode ? 'rgba(255,99,132,0.2)' : 'rgba(54,162,235,0.2)', 
         fill: true,
       },
     ],
